@@ -1,0 +1,7 @@
+{
+  "name": "FridgeInventory",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
