@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 export function usePhotoGallery(): {
   addNewToGallery: () => Promise<void>;
+  deletePhoto: (photo: UserPhoto) => Promise<void>;
   photos: UserPhoto[];
 } {
   const [photos, setPhotos] = useState<UserPhoto[]>([]);
@@ -108,8 +109,26 @@ export function usePhotoGallery(): {
     });
   };
 
+  const deletePhoto = async (photo: UserPhoto) => {
+    // Remove this photo from the Photos reference data array
+    const newPhotos = photos.filter((p) => p.filepath !== photo.filepath);
+
+    // Update photos array cache by overwriting the existing photo array
+    Preferences.set({ key: PHOTO_STORAGE, value: JSON.stringify(newPhotos) });
+
+    // Delete photo file from filesystem
+    const filename = photo.filepath.slice(photo.filepath.lastIndexOf("/") + 1);
+    await Filesystem.deleteFile({
+      path: filename,
+      directory: Directory.Data,
+    });
+
+    setPhotos(newPhotos);
+  };
+
   return {
     addNewToGallery,
+    deletePhoto,
     photos,
   };
 }
